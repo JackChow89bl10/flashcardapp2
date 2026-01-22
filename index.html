@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>FlashcardApp2 - 单词闪卡学习器</title>
+    <style>
+        /* 基础重置 */
+        body, div, p, h1, h2, h3, ul, li {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, "Microsoft YaHei", sans-serif;
+            background: #4a6fa5;
+            color: #333;
+            padding: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        /* 主容器 */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* 头部 */
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .app-icon-container {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 3px solid white;
+            background: #4a6fa5; /* 备用背景色 */
+        }
+        
+        .app-icon, .screenshot, .qr-code {
+            width: 100%;
+            height: 100%;
+            display: block;
+            border: none;
+        }
+        
+        .img-error {
+            background: #4a6fa5;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+        
+        .version-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        /* 内容区域 */
+        .content {
+            padding: 20px;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            border-left: 4px solid #4a6fa5;
+            padding-left: 12px;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        /* 应用信息 - 四格布局 */
+        .info-grid {
+            display: table;
+            width: 100%;
+            margin: 15px 0;
+            border-collapse: collapse;
+        }
+        
+        .info-row {
+            display: table-row;
+        }
+        
+        .info-card {
+            display: table-cell;
+            width: 25%;
+            padding: 10px;
+            text-align: center;
+            vertical-align: middle;
+            border: 1px solid #eee;
+        }
+        
+        .info-card h3 {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .info-card p {
+            color: #4a6fa5;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        /* 应用描述 */
+        .app-description {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+            border-left: 3px solid #4a6fa5;
+        }
+        
+        /* 功能列表 - 两列布局 */
+        .feature-container {
+            display: table;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .feature-column {
+            display: table-cell;
+            width: 50%;
+            vertical-align: top;
+            padding: 0 5px;
+        }
+        
+        .feature-item {
+            background: white;
+            padding: 12px 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            position: relative;
+        }
+        
+        .feature-item h3 {
+            color: #4a6fa5;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .feature-item h3:before {
+            content: "★ ";
+            color: #ffc107;
+        }
+        
+        .feature-item p {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        /* 截图区域 */
+        .screenshots-container {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 10px 0;
+            margin-top: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .screenshot-item {
+            display: inline-block;
+            width: 160px;
+            margin-right: 10px;
+            vertical-align: top;
+        }
+        
+        .screenshot-wrapper {
+            width: 160px;
+            height: 284px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+        }
+        
+        .caption {
+            text-align: center;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+            white-space: normal;
+        }
+        
+        /* 下载区域 */
+        .download-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #4a6fa5;
+            margin-top: 20px;
+        }
+        
+        .qr-container {
+            background: white;
+            width: 200px;
+            height: 200px;
+            margin: 15px auto;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px dashed #4a6fa5;
+            overflow: hidden;
+        }
+        
+        .password {
+            background: #fff3cd;
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 15px;
+            margin: 10px 0;
+            font-weight: bold;
+            color: #856404;
+            border: 1px solid #ffc107;
+            font-size: 14px;
+        }
+        
+        /* 下载按钮 */
+        .download-btn {
+            display: inline-block;
+            background: #4a6fa5;
+            color: white;
+            padding: 14px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 25px;
+            margin: 15px 0;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .download-btn:active {
+            background: #3a5ca9;
+            transform: translateY(2px);
+        }
+        
+        /* 警告提示 */
+        .warning {
+            background: #ffeaa7;
+            border: 1px solid #fdcb6e;
+            color: #333;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: left;
+        }
+        
+        .warning-title {
+            color: #d63031;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+        
+        .warning-title:before {
+            content: "⚠️ ";
+        }
+        
+        .install-steps {
+            margin-left: 15px;
+            margin-top: 8px;
+        }
+        
+        .install-steps li {
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+        
+        /* 页脚 */
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 12px;
+            border-top: 1px solid #eee;
+            background: #f8f9fa;
+        }
+        
+        .developer-info {
+            margin-bottom: 15px;
+            color: #4a6fa5;
+            font-size: 14px;
+        }
+        
+        .developer-info p {
+            margin-bottom: 5px;
+        }
+        
+        .copyright {
+            margin-top: 10px;
+            opacity: 0.7;
+            line-height: 1.5;
+        }
+        
+        /* 移动端适配 */
+        @media (max-width: 600px) {
+            body {
+                padding: 5px;
+            }
+            
+            .container {
+                border-radius: 5px;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .app-icon-container {
+                width: 70px;
+                height: 70px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .feature-column {
+                display: block;
+                width: 100%;
+                padding: 0;
+            }
+            
+            .screenshot-item {
+                width: 140px;
+            }
+            
+            .screenshot-wrapper {
+                width: 140px;
+                height: 249px;
+            }
+            
+            .qr-container {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .info-card {
+                display: block;
+                width: 50%;
+                float: left;
+                border: 1px solid #eee;
+            }
+            
+            .info-card:nth-child(odd) {
+                border-right: none;
+            }
+            
+            .info-card:nth-child(1), .info-card:nth-child(2) {
+                border-bottom: none;
+            }
+        }
+        
+        /* 清除浮动 */
+        .clearfix:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <div class="app-icon-container">
+                <!-- 直接使用图标URL，避免复杂的参数 -->
+                <img src="https://thumbnail1.baidupcs.com/thumbnail/32c3e065fkee6cce2c260fe2a3dee46c?fid=4289078697-250528-505848800960423&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-6%2bz4MYw7HVYL%2fg6LtIP45Q4RZNk%3d&expires=8h&chkbd=0&chkv=0&dp-logid=496479952355099701&dp-callid=0&time=1769043600&size=c1360_u768&quality=90&vuk=4289078697&ft=image&autopolicy=1" 
+                     alt="FlashcardApp2"
+                     class="app-icon"
+                     onerror="this.onerror=null;this.className='img-error';this.innerHTML='<div style=\'text-align:center;line-height:80px;font-size:24px;\'>F</div>'">
+            </div>
+            
+            <h1>FlashcardApp2</h1>
+            <div class="version-badge">版本 v1.0.0</div>
+            <p class="subtitle">个人专属单词记忆宫殿</p>
+        </div>
+        
+        <!-- 内容区域 -->
+        <div class="content">
+            <!-- 应用信息 -->
+            <div class="section">
+                <h2>应用信息</h2>
+                <div class="info-grid">
+                    <div class="info-row">
+                        <div class="info-card">
+                            <h3>应用大小</h3>
+                            <p>12.2 MB</p>
+                        </div>
+                        <div class="info-card">
+                            <h3>更新时间</h3>
+                            <p>2026-01-20</p>
+                        </div>
+                        <div class="info-card">
+                            <h3>支持系统</h3>
+                            <p>Android 8.0+</p>
+                        </div>
+                        <div class="info-card">
+                            <h3>当前版本</h3>
+                            <p>v1.0.0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 应用介绍 -->
+            <div class="section">
+                <h2>应用介绍</h2>
+                <div class="app-description">
+                    单词闪卡学习器，一个自定义学习单词的app，可以通过自定义编辑单词闪卡内容，创建自己想要的单词提示词，创建初衷是为了给自己创建一个属于自己的单词记忆宫殿，可以导入导出单词本，可以把学习过的单词移至新旧模糊盒单词本里，可以选择单词朗读人（测试中，免费朗读数量有限），特色是可以用车载HUD模式投屏镜像到汽车玻璃窗，可以用蓝牙连接蓝牙翻页器进行单词切换朗读（请大家务必注意安全，不要遮挡行车视野），充分利用思考时间创建单词记忆链接。
+                </div>
+            </div>
+            
+            <!-- 主要功能 - 两列布局 -->
+            <div class="section">
+                <h2>主要功能</h2>
+                <div class="feature-container">
+                    <!-- 左列 -->
+                    <div class="feature-column">
+                        <div class="feature-item">
+                            <h3>自定义记忆宫殿</h3>
+                            <p>完全自定义单词闪卡内容和提示词，构建个性化的记忆链接系统</p>
+                        </div>
+                        <div class="feature-item">
+                            <h3>三盒记忆管理</h3>
+                            <p>智能将单词分为新词、旧词、模糊词三个记忆盒子，科学安排复习</p>
+                        </div>
+                        <div class="feature-item">
+                            <h3>车载HUD模式</h3>
+                            <p>创新投影功能，可将单词镜像到汽车玻璃窗，安全利用行车时间</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 右列 -->
+                    <div class="feature-column">
+                        <div class="feature-item">
+                            <h3>蓝牙翻页控制</h3>
+                            <p>支持蓝牙翻页器连接，实现单词切换和朗读的无线控制</p>
+                        </div>
+                        <div class="feature-item">
+                            <h3>单词本导入导出</h3>
+                            <p>灵活管理单词本，支持多种格式导入和导出，方便备份和分享</p>
+                        </div>
+                        <div class="feature-item">
+                            <h3>多语音朗读</h3>
+                            <p>内置多种发音人选择，增强听力记忆（测试阶段功能）</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            
+            <!-- 应用截图 -->
+            <div class="section">
+                <h2>应用截图</h2>
+                <div class="screenshots-container">
+                    <!-- 截图1 - 主页 -->
+                    <div class="screenshot-item">
+                        <div class="screenshot-wrapper">
+                            <img src="https://cdn-app-screenshot.pgyer.com/2/7/e/8/7/27e872e24a5fb757cc21900c9ef475ce?x-oss-process=image/format,jpg" 
+                                 alt="主页界面"
+                                 class="screenshot"
+                                 onerror="this.onerror=null;this.className='img-error';this.innerHTML='<div style=\'text-align:center;padding-top:120px;font-size:14px;\'>主界面<br>(点击查看)</div>'">
+                        </div>
+                        <div class="caption">主界面</div>
+                    </div>
+                    
+                    <!-- 截图2 - 菜单 -->
+                    <div class="screenshot-item">
+                        <div class="screenshot-wrapper">
+                            <img src="https://cdn-app-screenshot.pgyer.com/c/3/4/9/1/c3491b784a15927bd02760a8b36e48b4?x-oss-process=image/format,jpg" 
+                                 alt="菜单界面"
+                                 class="screenshot"
+                                 onerror="this.onerror=null;this.className='img-error';this.innerHTML='<div style=\'text-align:center;padding-top:120px;font-size:14px;\'>菜单界面<br>(点击查看)</div>'">
+                        </div>
+                        <div class="caption">菜单界面</div>
+                    </div>
+                    
+                    <!-- 截图3 - HUD模式 -->
+                    <div class="screenshot-item">
+                        <div class="screenshot-wrapper">
+                            <img src="https://cdn-app-screenshot.pgyer.com/3/0/4/7/c/3047c87a934633318118c1e207fd3ed7?x-oss-process=image/format,jpg" 
+                                 alt="车载HUD模式"
+                                 class="screenshot"
+                                 onerror="this.onerror=null;this.className='img-error';this.innerHTML='<div style=\'text-align:center;padding-top:120px;font-size:14px;\'>HUD模式<br>(点击查看)</div>'">
+                        </div>
+                        <div class="caption">车载HUD模式</div>
+                    </div>
+                    
+                    <!-- 截图4 - 横屏模式 -->
+                    <div class="screenshot-item">
+                        <div class="screenshot-wrapper">
+                            <img src="https://cdn-app-screenshot.pgyer.com/0/1/b/b/6/01bb62ba6be8d3057791857237693126?x-oss-process=image/format,jpg" 
+                                 alt="横屏模式"
+                                 class="screenshot"
+                                 onerror="this.onerror=null;this.className='img-error';this.innerHTML='<div style=\'text-align:center;padding-top:120px;font-size:14px;\'>横屏模式<br>(点击查看)</div>'">
+                        </div>
+                        <div class="caption">横屏模式</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 下载区域 -->
+            <div class="section">
+                <div class="download-section">
+                    <h2>立即下载</h2>
+                    <p style="margin-bottom: 15px; color: #666; font-size: 14px;">
+                        扫描二维码或点击下方按钮下载
+                    </p>
+                    
+                    <!-- 二维码 - 使用百度云链接 -->
+                    <div class="qr-container">
+                        <img src="https://thumbnail1.baidupcs.com/thumbnail/d176eb75bj68b61adea271c7ea4bbfa5?fid=4289078697-250528-260054510481688&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-UqzX7iNHELEpGDBzy%2fm2%2feelyU4%3d&expires=8h&chkbd=0&chkv=0&dp-logid=496333723214199864&dp-callid=0&time=1769043600&size=c1360_u768&quality=90&vuk=4289078697&ft=image&autopolicy=1" 
+                             alt="下载二维码"
+                             class="qr-code"
+                             onerror="this.onerror=null;this.className='img-error';this.innerHTML='<div style=\'text-align:center;padding-top:80px;font-size:14px;\'>二维码加载失败<br>请点击下方按钮下载</div>'">
+                    </div>
+                    
+                    <!-- 提取密码 -->
+                    <div class="password">提取密码：c5fh</div>
+                    
+                    <!-- 下载按钮 -->
+                    <a href="https://wwawo.lanzoub.com/izhJR3gn9xpa" 
+                       class="download-btn" 
+                       target="_blank"
+                       onclick="return trackDownload()">
+                        前往蓝奏云下载
+                    </a>
+                    
+                    <!-- 安全提示 -->
+                    <div class="warning">
+                        <div class="warning-title">重要安全提示</div>
+                        <p style="margin-bottom: 8px; font-size: 13px;">
+                            在使用车载HUD功能时，请务必遵守以下安全准则：
+                        </p>
+                        <ul class="install-steps">
+                            <li>仅在车辆静止或副驾驶位置使用投影功能</li>
+                            <li>确保投影区域不影响正常行车视野</li>
+                            <li>驾驶员请集中注意力于道路，不要分心</li>
+                            <li>建议在停车场或等待红灯时使用学习功能</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 页脚 -->
+        <footer>
+            <div class="developer-info">
+                <p><strong>开发者：</strong>JackChow</p>
+                <p><strong>联系方式：</strong>QQ：939263308</p>
+                <p><strong>应用版本：</strong>v1.0.0 | 更新时间：2026年1月20日</p>
+            </div>
+            <div class="copyright">
+                <p>© 2024-2026 FlashcardApp2 版权所有</p>
+                <p>本应用为个人开发项目，仅供学习交流使用</p>
+                <p>未经开发者书面许可，禁止任何形式的商业使用、二次分发或修改</p>
+            </div>
+        </footer>
+    </div>
+    
+    <script>
+        // 页面加载完成后初始化
+        if (document.addEventListener) {
+            document.addEventListener('DOMContentLoaded', initPage);
+        } else {
+            window.onload = initPage;
+        }
+        
+        function initPage() {
+            console.log('页面初始化');
+            
+            // 预加载图片
+            preloadImages();
+            
+            // 添加图片点击查看功能
+            setupImageZoom();
+        }
+        
+        // 预加载图片
+        function preloadImages() {
+            var imageUrls = [
+                'https://cdn-app-icon2.pgyer.com/f/c/4/b/d/fc4bd220d60c04852fc5253190f23758',
+                'https://cdn-app-screenshot.pgyer.com/2/7/e/8/7/27e872e24a5fb757cc21900c9ef475ce?x-oss-process=image/format,jpg',
+                'https://cdn-app-screenshot.pgyer.com/c/3/4/9/1/c3491b784a15927bd02760a8b36e48b4?x-oss-process=image/format,jpg',
+                'https://cdn-app-screenshot.pgyer.com/3/0/4/7/c/3047c87a934633318118c1e207fd3ed7?x-oss-process=image/format,jpg',
+                'https://cdn-app-screenshot.pgyer.com/0/1/b/b/6/01bb62ba6be8d3057791857237693126?x-oss-process=image/format,jpg',
+                'https://thumbnail1.baidupcs.com/thumbnail/d176eb75bj68b61adea271c7ea4bbfa5?fid=4289078697-250528-260054510481688&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-UqzX7iNHELEpGDBzy%2fm2%2feelyU4%3d&expires=8h&chkbd=0&chkv=0&dp-logid=496333723214199864&dp-callid=0&time=1769043600&size=c1360_u768&quality=90&vuk=4289078697&ft=image&autopolicy=1'
+            ];
+            
+            for (var i = 0; i < imageUrls.length; i++) {
+                var img = new Image();
+                img.src = imageUrls[i];
+            }
+        }
+        
+        // 图片点击放大查看功能
+        function setupImageZoom() {
+            var screenshots = document.querySelectorAll('.screenshot');
+            var qrCode = document.querySelector('.qr-code');
+            
+            // 为截图添加点击事件
+            for (var i = 0; i < screenshots.length; i++) {
+                (function(img) {
+                    img.addEventListener('click', function() {
+                        showImageZoom(this.src, '应用截图');
+                    });
+                })(screenshots[i]);
+            }
+            
+            // 为二维码添加点击事件
+            if (qrCode) {
+                qrCode.addEventListener('click', function() {
+                    showImageZoom(this.src, '下载二维码');
+                });
+            }
+        }
+        
+        // 显示图片放大层
+        function showImageZoom(src, title) {
+            // 创建遮罩层
+            var overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+            
+            // 创建标题
+            var titleDiv = document.createElement('div');
+            titleDiv.style.cssText = 'color:white;font-size:16px;margin-bottom:10px;';
+            titleDiv.textContent = title;
+            
+            // 创建图片容器
+            var imgContainer = document.createElement('div');
+            imgContainer.style.cssText = 'max-width:90%;max-height:70%;display:flex;align-items:center;justify-content:center;';
+            
+            // 创建图片
+            var zoomedImg = new Image();
+            zoomedImg.src = src;
+            zoomedImg.style.cssText = 'max-width:100%;max-height:100%;border-radius:5px;';
+            
+            // 创建关闭按钮
+            var closeBtn = document.createElement('button');
+            closeBtn.textContent = '关闭';
+            closeBtn.style.cssText = 'margin-top:15px;padding:8px 20px;background:#4a6fa5;color:white;border:none;border-radius:5px;font-size:14px;';
+            
+            // 组装元素
+            imgContainer.appendChild(zoomedImg);
+            overlay.appendChild(titleDiv);
+            overlay.appendChild(imgContainer);
+            overlay.appendChild(closeBtn);
+            
+            // 添加到页面
+            document.body.appendChild(overlay);
+            
+            // 点击遮罩层或按钮关闭
+            function closeOverlay() {
+                document.body.removeChild(overlay);
+            }
+            
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay || e.target === closeBtn) {
+                    closeOverlay();
+                }
+            });
+            
+            // 按ESC键关闭
+            document.addEventListener('keydown', function onKeyDown(e) {
+                if (e.keyCode === 27) { // ESC键
+                    closeOverlay();
+                    document.removeEventListener('keydown', onKeyDown);
+                }
+            });
+        }
+        
+        // 下载跟踪
+        function trackDownload() {
+            console.log('开始下载...');
+            
+            // 显示简单提示
+            alert('正在跳转到下载页面...');
+            
+            // 允许链接正常跳转
+            return true;
+        }
+        
+        // 华为手机特定修复
+        function fixForHuawei() {
+            // 检测是否是华为旧手机
+            var ua = navigator.userAgent.toLowerCase();
+            var isHuawei = ua.indexOf('huawei') > -1 || ua.indexOf('honor') > -1;
+            
+            if (isHuawei) {
+                console.log('检测到华为设备，启用兼容模式');
+                
+                // 移除可能不支持的CSS
+                var elements = document.querySelectorAll('.feature-item, .screenshot-wrapper');
+                for (var i = 0; i < elements.length; i++) {
+                    elements[i].style.transition = 'none';
+                }
+            }
+        }
+        
+        // 执行华为手机修复
+        setTimeout(fixForHuawei, 100);
+    </script>
+</body>
+</html>
